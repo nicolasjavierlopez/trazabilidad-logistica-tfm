@@ -34,6 +34,11 @@ contract RawMaterial {
     mapping(address => uint256[]) private senderTransferIds;
     mapping(address => uint256[]) private recipientTransferIds;
 
+    // Balance recibido por titulares no-creadores (tokenId => holder => amount)
+    mapping(uint256 => mapping(address => uint256)) private receivedBalance;
+    // Evita duplicados en ownerTokenIds al recibir el mismo token varias veces
+    mapping(address => mapping(uint256 => bool)) private tokenInOwnerList;
+
     event TokenCreated(uint256 indexed tokenId, address indexed creator, string name, uint256 supply);
     event TransferRequested(uint256 indexed transferId, uint256 indexed tokenId, address indexed from, address to, uint256 amount);
     event TransferAccepted(uint256 indexed transferId);
@@ -65,6 +70,7 @@ contract RawMaterial {
             createdAt: block.timestamp
         });
         ownerTokenIds[msg.sender].push(id);
+        tokenInOwnerList[msg.sender][id] = true;
         emit TokenCreated(id, msg.sender, name, supply);
         return id;
     }
@@ -74,9 +80,18 @@ contract RawMaterial {
         if (amount == 0) revert InvalidAmount();
         Token storage t = tokens[tokenId];
         if (t.id == 0) revert TokenNotFound();
-        if (t.creator != msg.sender) revert NotTokenOwner();
-        if (t.balance < amount) revert InsufficientBalance();
-        t.balance -= amount;
+
+        bool isCreator = t.creator == msg.sender;
+        uint256 senderBal = isCreator ? t.balance : receivedBalance[tokenId][msg.sender];
+        if (!isCreator && senderBal == 0) revert NotTokenOwner();
+        if (senderBal < amount) revert InsufficientBalance();
+
+        if (isCreator) {
+            t.balance -= amount;
+        } else {
+            receivedBalance[tokenId][msg.sender] -= amount;
+        }
+
         uint256 id = nextTransferId++;
         transferRequests[id] = TransferRequest({
             id: id,
@@ -99,6 +114,12 @@ contract RawMaterial {
         if (req.to != msg.sender) revert NotTransferRecipient();
         if (req.status != TransferStatus.Pending) revert TransferNotPending();
         req.status = TransferStatus.Accepted;
+
+        receivedBalance[req.tokenId][req.to] += req.amount;
+        if (!tokenInOwnerList[req.to][req.tokenId]) {
+            ownerTokenIds[req.to].push(req.tokenId);
+            tokenInOwnerList[req.to][req.tokenId] = true;
+        }
         emit TransferAccepted(transferId);
     }
 
@@ -108,7 +129,13 @@ contract RawMaterial {
         if (req.from != msg.sender) revert NotTransferSender();
         if (req.status != TransferStatus.Pending) revert TransferNotPending();
         req.status = TransferStatus.Cancelled;
-        tokens[req.tokenId].balance += req.amount;
+
+        Token storage t = tokens[req.tokenId];
+        if (t.creator == req.from) {
+            t.balance += req.amount;
+        } else {
+            receivedBalance[req.tokenId][req.from] += req.amount;
+        }
         emit TransferCancelled(transferId);
     }
 
@@ -118,7 +145,13 @@ contract RawMaterial {
         if (req.to != msg.sender) revert NotTransferRecipient();
         if (req.status != TransferStatus.Pending) revert TransferNotPending();
         req.status = TransferStatus.Rejected;
-        tokens[req.tokenId].balance += req.amount;
+
+        Token storage t = tokens[req.tokenId];
+        if (t.creator == req.from) {
+            t.balance += req.amount;
+        } else {
+            receivedBalance[req.tokenId][req.from] += req.amount;
+        }
         emit TransferRejected(transferId);
     }
 
@@ -146,5 +179,17 @@ contract RawMaterial {
         TransferRequest[] memory result = new TransferRequest[](ids.length);
         for (uint256 i = 0; i < ids.length; i++) result[i] = transferRequests[ids[i]];
         return result;
+    }
+
+    function getReceivedBalance(uint256 tokenId, address holder) external view returns (uint256) {
+        return receivedBalance[tokenId][holder];
+    }
+
+    function getReceivedBalancesBatch(uint256[] calldata tokenIds, address holder) external view returns (uint256[] memory) {
+        uint256[] memory balances = new uint256[](tokenIds.length);
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            balances[i] = receivedBalance[tokenIds[i]][holder];
+        }
+        return balances;
     }
 }
