@@ -186,6 +186,24 @@ const translations = {
     addParent: "Add parent",
     parentTokens: "Parent tokens",
 
+    // Batch CSV upload
+    batchUpload: "Batch upload",
+    uploadCsv: "Upload CSV",
+    downloadTemplate: "Download template",
+    batchPreview: "CSV preview",
+    batchCreateAll: "Create {{count}} tokens",
+    batchClear: "Clear",
+    batchComplete: "Batch complete — {{count}} tokens created",
+    batchProgress: "{{done}} / {{total}} processed",
+    batchRowsLoaded: "{{count}} rows loaded",
+    batchValidationErrors: "{{count}} rows with errors (will be skipped)",
+    batchRunning: "Processing…",
+    batchColStatus: "Status",
+    batchColName: "Name",
+    batchColSupply: "Supply",
+    batchColParents: "Parent(s)",
+    batchColFeatures: "Features",
+
     // Traceability
     viewTraceability: "View Traceability",
     traceabilityTitle: "Token Traceability",
@@ -381,6 +399,24 @@ const translations = {
     // Multi-parent create
     addParent: "Agregar parent",
     parentTokens: "Tokens padre",
+
+    // Batch CSV upload
+    batchUpload: "Carga masiva",
+    uploadCsv: "Subir CSV",
+    downloadTemplate: "Descargar plantilla",
+    batchPreview: "Vista previa del CSV",
+    batchCreateAll: "Crear {{count}} tokens",
+    batchClear: "Limpiar",
+    batchComplete: "Carga completa — {{count}} tokens creados",
+    batchProgress: "{{done}} / {{total}} procesados",
+    batchRowsLoaded: "{{count}} filas cargadas",
+    batchValidationErrors: "{{count}} filas con errores (serán omitidas)",
+    batchRunning: "Procesando…",
+    batchColStatus: "Estado",
+    batchColName: "Nombre",
+    batchColSupply: "Suministro",
+    batchColParents: "Parent(s)",
+    batchColFeatures: "Features",
 
     // Traceability
     viewTraceability: "Ver Trazabilidad",

@@ -34,10 +34,13 @@ export default function CheckoutPage() {
   const orderNumber = useMemo(() => generateOrderNumber(), []);
   const orderDate = useMemo(() => formatDate(new Date()), []);
 
+  // Snapshot items at confirmation time so they persist in the invoice after cart is cleared
+  const [frozenItems, setFrozenItems] = useState(items);
+
   const invoiceData = {
     orderNumber,
     date: orderDate,
-    items,
+    items: frozenItems,
     address,
   };
 
@@ -49,6 +52,7 @@ export default function CheckoutPage() {
     false;
 
   const handleComplete = () => {
+    setFrozenItems(items); // snapshot before clearing
     setConfirmed(true);
     clear();
   };
