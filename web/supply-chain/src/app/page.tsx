@@ -2,10 +2,11 @@
 import { useEffect, useState } from "react";
 import {
   Box, Card, CardContent, Typography, Button, Alert,
-  CircularProgress, Divider,
+  CircularProgress, Divider, Dialog, DialogTitle, DialogContent, DialogActions,
 } from "@mui/material";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { useAccount, useConnect } from "wagmi";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
@@ -25,6 +26,7 @@ export default function HomePage() {
 
   const [showRoleSelect, setShowRoleSelect] = useState(false);
   const [isPending, setIsPending] = useState(false); // account awaiting approval
+  const [noMetaMask, setNoMetaMask] = useState(false);
 
   const {
     data: isRegistered,
@@ -99,6 +101,10 @@ export default function HomePage() {
   }, [isSuccess]);
 
   const handleConnect = () => {
+    if (typeof window !== "undefined" && !window.ethereum) {
+      setNoMetaMask(true);
+      return;
+    }
     const c = connectors[0];
     if (c) connect({ connector: c });
   };
@@ -181,44 +187,74 @@ export default function HomePage() {
 
   // ── Default: connect wallet ────────────────────────────────────────────
   return (
-    <Box className="min-h-screen flex flex-col bg-slate-50">
-      <AppToolbar showConnect onConnectClick={handleConnect} />
-      <Box className="flex-1 flex flex-col items-center justify-center p-4">
-        <Card className="max-w-md w-full shadow-lg">
-          <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, p: 5 }}>
-            <Box sx={{ textAlign: "center" }}>
-              <Typography variant="h5" sx={{ fontWeight: 800, mb: 1 }}>{t("welcome")}</Typography>
-              <Typography variant="body2" color="text.secondary">{t("connectMetaMask")}</Typography>
-            </Box>
+    <>
+      <Box className="min-h-screen flex flex-col bg-slate-50">
+        <AppToolbar showConnect onConnectClick={handleConnect} />
+        <Box className="flex-1 flex flex-col items-center justify-center p-4">
+          <Card className="max-w-md w-full shadow-lg">
+            <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, p: 5 }}>
+              <Box sx={{ textAlign: "center" }}>
+                <Typography variant="h5" sx={{ fontWeight: 800, mb: 1 }}>{t("welcome")}</Typography>
+                <Typography variant="body2" color="text.secondary">{t("connectMetaMask")}</Typography>
+              </Box>
 
-            <Button
-              variant="contained"
-              size="large"
-              startIcon={
-                isLoading && isConnected
-                  ? <CircularProgress size={18} color="inherit" />
-                  : <AccountBalanceWalletIcon />
-              }
-              onClick={handleConnect}
-              disabled={connecting || registering || (isLoading && isConnected)}
-              fullWidth
-              sx={{ py: 1.5 }}
-            >
-              {isLoading && isConnected ? t("processing") : t("signIn")}
-            </Button>
-
-            {isConnected && address && (
-              <Typography
-                variant="caption"
-                color="text.disabled"
-                sx={{ fontFamily: "monospace", wordBreak: "break-all", textAlign: "center" }}
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={
+                  isLoading && isConnected
+                    ? <CircularProgress size={18} color="inherit" />
+                    : <AccountBalanceWalletIcon />
+                }
+                onClick={handleConnect}
+                disabled={connecting || registering || (isLoading && isConnected)}
+                fullWidth
+                sx={{ py: 1.5 }}
               >
-                {address}
-              </Typography>
-            )}
-          </CardContent>
-        </Card>
+                {isLoading && isConnected ? t("processing") : t("signIn")}
+              </Button>
+
+              {isConnected && address && (
+                <Typography
+                  variant="caption"
+                  color="text.disabled"
+                  sx={{ fontFamily: "monospace", wordBreak: "break-all", textAlign: "center" }}
+                >
+                  {address}
+                </Typography>
+              )}
+            </CardContent>
+          </Card>
+        </Box>
       </Box>
-    </Box>
+
+      <Dialog open={noMetaMask} onClose={() => setNoMetaMask(false)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1.5, pb: 1 }}>
+          <AccountBalanceWalletIcon sx={{ color: "warning.main", fontSize: 28 }} />
+          {t("noMetaMaskTitle")}
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary">
+            {t("noMetaMaskDesc")}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+          <Button onClick={() => setNoMetaMask(false)} color="inherit" size="small">
+            {t("close")}
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            href="https://metamask.io/download/"
+            target="_blank"
+            rel="noopener noreferrer"
+            endIcon={<OpenInNewIcon fontSize="small" />}
+            onClick={() => setNoMetaMask(false)}
+          >
+            {t("noMetaMaskInstall")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }

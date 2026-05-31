@@ -9,6 +9,9 @@ const translations = {
     // Toolbar
     signIn: "Sign in",
     signOut: "Sign out",
+    noMetaMaskTitle: "MetaMask is not installed",
+    noMetaMaskDesc: "This app requires the MetaMask browser extension to connect your wallet and interact with the blockchain. Install it and reload the page.",
+    noMetaMaskInstall: "Install MetaMask",
     langEnglish: "English",
     langSpanish: "Español",
 
@@ -222,6 +225,9 @@ const translations = {
     // Toolbar
     signIn: "Iniciar sesión",
     signOut: "Cerrar sesión",
+    noMetaMaskTitle: "MetaMask no está instalado",
+    noMetaMaskDesc: "Esta aplicación requiere la extensión MetaMask para conectar tu wallet e interactuar con la blockchain. Instalala y recargá la página.",
+    noMetaMaskInstall: "Instalar MetaMask",
     langEnglish: "English",
     langSpanish: "Español",
 

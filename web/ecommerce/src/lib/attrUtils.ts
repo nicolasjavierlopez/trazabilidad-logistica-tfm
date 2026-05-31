@@ -8,5 +8,5 @@ export function formatAttrKey(key: string): string {
 }
 
 export function visibleAttrs(features: Record<string, unknown>): [string, unknown][] {
-  return Object.entries(features).filter(([k]) => !HIDDEN_KEYS.has(k));
+  return Object.entries(features).filter(([k]) => !HIDDEN_KEYS.has(k) && !k.toLowerCase().includes("parent"));
 }

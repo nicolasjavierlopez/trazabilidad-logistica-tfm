@@ -3,13 +3,15 @@ import { useState } from "react";
 import {
   AppBar, Toolbar, Typography, Box, IconButton, Button,
   Badge, Tooltip, Avatar, Menu, MenuItem, Chip, useMediaQuery, useTheme,
-  ListItemIcon, Divider,
+  ListItemIcon, Divider, Dialog, DialogTitle, DialogContent, DialogActions,
 } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import LocalPharmacyIcon from "@mui/icons-material/LocalPharmacy";
 import LanguageIcon from "@mui/icons-material/Language";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import LogoutIcon from "@mui/icons-material/Logout";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { useAccount, useConnect, useDisconnect, useChainId } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { useCart } from "@/context/CartContext";
@@ -38,6 +40,15 @@ export default function AppToolbar() {
   const [langAnchor, setLangAnchor] = useState<null | HTMLElement>(null);
   const [userAnchor, setUserAnchor] = useState<null | HTMLElement>(null);
   const [copiedAddr, setCopiedAddr] = useState(false);
+  const [noMetaMask, setNoMetaMask] = useState(false);
+
+  const handleConnect = () => {
+    if (typeof window !== "undefined" && !window.ethereum) {
+      setNoMetaMask(true);
+      return;
+    }
+    connect({ connector: injected() });
+  };
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -169,7 +180,7 @@ export default function AppToolbar() {
             <Button
               variant="contained"
               size="small"
-              onClick={() => connect({ connector: injected() })}
+              onClick={handleConnect}
               sx={{ bgcolor: "primary.light", "&:hover": { bgcolor: "#388e3c" }, color: "#fff", fontWeight: 700, flexShrink: 0 }}
             >
               {t("signIn")}
@@ -179,6 +190,35 @@ export default function AppToolbar() {
       </AppBar>
 
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+
+      {/* MetaMask not installed dialog */}
+      <Dialog open={noMetaMask} onClose={() => setNoMetaMask(false)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1.5, pb: 1 }}>
+          <AccountBalanceWalletIcon sx={{ color: "warning.main", fontSize: 28 }} />
+          {t("noMetaMaskTitle")}
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary">
+            {t("noMetaMaskDesc")}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+          <Button onClick={() => setNoMetaMask(false)} color="inherit" size="small">
+            {t("close")}
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            href="https://metamask.io/download/"
+            target="_blank"
+            rel="noopener noreferrer"
+            endIcon={<OpenInNewIcon fontSize="small" />}
+            onClick={() => setNoMetaMask(false)}
+          >
+            {t("noMetaMaskInstall")}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

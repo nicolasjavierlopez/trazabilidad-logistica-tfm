@@ -1,36 +1,44 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-/// @title UserRegistry - Role-based registration and admin approval for supply chain users
+/// @title UserRegistry
+/// @notice Registro de usuarios con roles y flujo de aprobacion por el administrador.
+/// @dev El admin se registra automaticamente como aprobado en el constructor.
+///      Cualquier otra wallet llama a `register` y queda en estado Pending hasta
+///      que el admin invoque `approveUser` o `rejectUser`.
 contract UserRegistry {
+    /// @notice Roles posibles de un usuario en el sistema.
     enum UserRole {
-        None,
-        Admin,
-        Producer,
-        Factory,
-        Retailer,
-        Consumer
+        None,      // Sin rol (valor por defecto / desconocido)
+        Admin,     // Administrador del sistema
+        Producer,  // Productor de materia prima
+        Factory,   // Fabrica que procesa materiales
+        Retailer,  // Minorista que vende al consumidor
+        Consumer   // Consumidor final
     }
 
+    /// @notice Estados del ciclo de vida de un usuario.
     enum UserStatus {
-        None,
-        Pending,
-        Approved,
-        Rejected
+        None,     // No registrado
+        Pending,  // Registro enviado, pendiente de aprobacion
+        Approved, // Acceso concedido
+        Rejected  // Acceso denegado
     }
 
+    /// @notice Datos de un usuario registrado.
     struct User {
         address wallet;
         UserRole role;
         UserStatus status;
-        uint256 registeredAt;
-        uint256 txCount;
+        uint256 registeredAt; // Timestamp Unix del registro
+        uint256 txCount;      // Numero de acciones registradas en el log
     }
 
+    /// @notice Entrada del log de acciones de un usuario.
     struct Transaction {
-        bytes32 txHash;
+        bytes32 txHash;    // Hash derivado del estado en el momento de la accion
         uint256 timestamp;
-        string action;
+        string action;     // "register" | "approve" | "reject" | "set_pending" | ...
     }
 
     address public admin;
@@ -53,11 +61,15 @@ contract UserRegistry {
         _;
     }
 
+    /// @param _admin Direccion que actua como administrador del sistema.
     constructor(address _admin) {
         admin = _admin;
         _createUser(_admin, UserRole.Admin, UserStatus.Approved, "admin_initialized");
     }
 
+    /// @notice Registra la wallet del llamante con el rol indicado.
+    /// @dev El estado inicial siempre es Pending. No se puede registrar como Admin ni como None.
+    /// @param _role Valor numerico del enum UserRole (2=Producer, 3=Factory, 4=Retailer, 5=Consumer).
     function register(uint8 _role) external {
         if (walletToUserId[msg.sender] != 0) revert AlreadyRegistered();
 
@@ -67,6 +79,8 @@ contract UserRegistry {
         _createUser(msg.sender, role, UserStatus.Pending, "register");
     }
 
+    /// @notice Aprueba un usuario, concediendole acceso al sistema.
+    /// @param _userId ID interno del usuario a aprobar.
     function approveUser(uint256 _userId) external onlyAdmin {
         User storage user = users[_userId];
         if (user.wallet == address(0)) revert UserNotFound();
@@ -75,6 +89,8 @@ contract UserRegistry {
         emit UserStatusChanged(_userId, UserStatus.Approved);
     }
 
+    /// @notice Rechaza un usuario, denegando su acceso.
+    /// @param _userId ID interno del usuario a rechazar.
     function rejectUser(uint256 _userId) external onlyAdmin {
         User storage user = users[_userId];
         if (user.wallet == address(0)) revert UserNotFound();
@@ -83,6 +99,8 @@ contract UserRegistry {
         emit UserStatusChanged(_userId, UserStatus.Rejected);
     }
 
+    /// @notice Devuelve a Pending un usuario previamente aprobado o rechazado.
+    /// @param _userId ID interno del usuario.
     function setPending(uint256 _userId) external onlyAdmin {
         User storage user = users[_userId];
         if (user.wallet == address(0)) revert UserNotFound();
@@ -91,6 +109,9 @@ contract UserRegistry {
         emit UserStatusChanged(_userId, UserStatus.Pending);
     }
 
+    /// @notice Devuelve los datos de un usuario buscando por su direccion wallet.
+    /// @dev Devuelve una estructura con todos los campos a cero si la wallet no esta registrada.
+    /// @param _wallet Direccion Ethereum del usuario.
     function getUserByWallet(address _wallet) external view returns (User memory) {
         uint256 userId = walletToUserId[_wallet];
         if (userId == 0) {
@@ -99,10 +120,14 @@ contract UserRegistry {
         return users[userId];
     }
 
+    /// @notice Devuelve los datos de un usuario por su ID interno.
+    /// @param _userId ID interno del usuario.
     function getUser(uint256 _userId) external view returns (User memory) {
         return users[_userId];
     }
 
+    /// @notice Devuelve todos los usuarios registrados (incluyendo al admin).
+    /// @return Array de structs User ordenados por fecha de registro.
     function getAllUsers() external view returns (User[] memory) {
         uint256 count = nextUserId - 1;
         User[] memory result = new User[](count);
@@ -112,6 +137,11 @@ contract UserRegistry {
         return result;
     }
 
+    /// @notice Conteo de usuarios agrupado por estado.
+    /// @return total Total de usuarios registrados.
+    /// @return pending Usuarios con estado Pending.
+    /// @return approved Usuarios con estado Approved.
+    /// @return rejected Usuarios con estado Rejected.
     function getUserCount()
         external
         view
@@ -126,13 +156,19 @@ contract UserRegistry {
         }
     }
 
+    /// @notice Devuelve el log de acciones de un usuario.
+    /// @param _userId ID interno del usuario.
     function getUserTransactions(uint256 _userId) external view returns (Transaction[] memory) {
         return userTransactions[_userId];
     }
 
+    /// @notice Indica si una wallet esta registrada en el sistema.
+    /// @param _wallet Direccion Ethereum a verificar.
     function isRegistered(address _wallet) external view returns (bool) {
         return walletToUserId[_wallet] != 0;
     }
+
+    // ── Internos ─────────────────────────────────────────────────────────────
 
     function _createUser(address wallet, UserRole role, UserStatus status, string memory action) internal {
         uint256 userId = nextUserId++;

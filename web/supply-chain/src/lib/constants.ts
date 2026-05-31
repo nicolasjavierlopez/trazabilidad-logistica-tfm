@@ -16,6 +16,15 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   [UserRole.Factory]: "Factory", [UserRole.Retailer]: "Retailer", [UserRole.Consumer]: "Consumer",
 };
 
+export const ROLE_COLORS: Record<UserRole, string> = {
+  [UserRole.None]: "#9e9e9e",
+  [UserRole.Admin]: "#795548",
+  [UserRole.Producer]: "#2e7d32",
+  [UserRole.Factory]: "#1565c0",
+  [UserRole.Retailer]: "#e65100",
+  [UserRole.Consumer]: "#6a1b9a",
+};
+
 export const STATUS_LABELS: Record<UserStatus, string> = {
   [UserStatus.None]: "None", [UserStatus.Pending]: "Pending",
   [UserStatus.Approved]: "Approved", [UserStatus.Rejected]: "Rejected",

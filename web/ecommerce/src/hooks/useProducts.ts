@@ -7,6 +7,11 @@ import type { Address, Abi } from "viem";
 
 const RAW_ABI = RawMaterialAbi as Abi;
 
+function sanitizeUrl(url: string): string {
+  const second = url.indexOf("https://", 8);
+  return second !== -1 ? url.slice(0, second) : url;
+}
+
 interface UserRow { wallet: Address; role: number; status: number; registeredAt: bigint; txCount: bigint; }
 
 export interface Product {
@@ -63,7 +68,11 @@ export function useProducts() {
         tokenId: tok.id.toString(),
         name: tok.name,
         supply: tok.supply,
-        imgUrl: typeof features.imgUrl === "string" ? features.imgUrl : undefined,
+        imgUrl: typeof features.imgUrl === "string"
+          ? sanitizeUrl(features.imgUrl)
+          : typeof features.urlImg === "string"
+            ? sanitizeUrl(features.urlImg)
+            : undefined,
         features,
         retailer,
         createdAt: tok.createdAt,

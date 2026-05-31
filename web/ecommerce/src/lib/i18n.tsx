@@ -14,6 +14,9 @@ const translations = {
     // Auth
     signIn: "Sign in",
     signOut: "Disconnect",
+    noMetaMaskTitle: "MetaMask is not installed",
+    noMetaMaskDesc: "This app requires the MetaMask browser extension to connect your wallet and interact with the blockchain. Install it and reload the page.",
+    noMetaMaskInstall: "Install MetaMask",
     cart: "Cart",
     copyAddress: "Copy address",
     copied: "Copied!",
@@ -128,6 +131,9 @@ const translations = {
     // Auth
     signIn: "Ingresar",
     signOut: "Desconectar",
+    noMetaMaskTitle: "MetaMask no está instalado",
+    noMetaMaskDesc: "Esta aplicación requiere la extensión MetaMask para conectar tu wallet e interactuar con la blockchain. Instalala y recargá la página.",
+    noMetaMaskInstall: "Instalar MetaMask",
     cart: "Carrito",
     copyAddress: "Copiar dirección",
     copied: "¡Copiado!",
@@ -264,7 +270,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       const dict = translations[locale] as Record<string, string>;
       let str = dict[key] ?? (translations.en as Record<string, string>)[key] ?? key;
       if (vars) {
-        Object.entries(vars).forEach(([k, v]) => { str = str.replace(`{{${k}}}`, v); });
+        Object.entries(vars).forEach(([k, v]) => { str = str.replaceAll(`{{${k}}}`, v); });
       }
       return str;
     },
