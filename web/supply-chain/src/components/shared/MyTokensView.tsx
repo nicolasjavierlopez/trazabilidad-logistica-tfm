@@ -70,7 +70,7 @@ export default function MyTokensView() {
     token.creator.toLowerCase() !== address?.toLowerCase();
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const paginated = tokens.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
   const [menuToken, setMenuToken] = useState<RawToken | null>(null);

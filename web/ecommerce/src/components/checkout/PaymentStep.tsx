@@ -8,7 +8,8 @@ import PrintIcon from "@mui/icons-material/Print";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlined";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
-import { useAccount, useSendTransaction, useWaitForTransactionReceipt } from "wagmi";
+import { useAccount, useChainId, useSendTransaction, useWaitForTransactionReceipt } from "wagmi";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import Invoice from "./Invoice";
 import type { InvoiceData } from "./Invoice";
 import { useI18n } from "@/lib/i18n";
@@ -23,6 +24,8 @@ type PayMethod = "wallet" | "card";
 export default function PaymentStep({ invoiceData, onComplete }: Props) {
   const { t } = useI18n();
   const { address, isConnected } = useAccount();
+  const chainId = useChainId();
+  const explorerBase = chainId === 11155111 ? "https://sepolia.etherscan.io" : null;
   const invoiceRef = useRef<HTMLDivElement>(null);
 
   const [payMethod, setPayMethod] = useState<PayMethod>("wallet");
@@ -92,6 +95,31 @@ export default function PaymentStep({ invoiceData, onComplete }: Props) {
       {confirmed && (
         <Alert icon={<CheckCircleOutlineIcon />} severity="success" sx={{ fontWeight: 600 }}>
           {t("orderConfirmed")}
+          {txHash && (
+            <Box sx={{ mt: 1.5, display: "flex", flexDirection: "column", gap: 0.5 }}>
+              <Typography variant="caption" color="text.secondary">
+                {t("txHash")}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ fontFamily: "monospace", wordBreak: "break-all", color: "text.primary", fontSize: "0.72rem" }}
+              >
+                {txHash}
+              </Typography>
+              {explorerBase && (
+                <Button
+                  size="small"
+                  href={`${explorerBase}/tx/${txHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  endIcon={<OpenInNewIcon fontSize="small" />}
+                  sx={{ alignSelf: "flex-start", mt: 0.5, textTransform: "none", fontSize: "0.78rem" }}
+                >
+                  {t("viewOnExplorer")}
+                </Button>
+              )}
+            </Box>
+          )}
         </Alert>
       )}
 

@@ -8,9 +8,9 @@ import {RawMaterial} from "../src/RawMaterial.sol";
 
 contract DeployScript is Script {
     function run() external {
-        address admin = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
-
         vm.startBroadcast();
+
+        address admin = msg.sender;
 
         UserRegistry registry = new UserRegistry(admin);
         LogisticsTracking tracking = new LogisticsTracking(admin);

@@ -100,6 +100,12 @@ const translations = {
     featuresJson: "Features (JSON)",
     invalidJsonFormat: "Invalid JSON format",
     createTokenBtn: "Create Token",
+    fieldUnidadMedida: "Unit of Measure",
+    fieldUnidadMedidaPlaceholder: "e.g. unit, kg, litre",
+    fieldImgUrl: "Image URL",
+    fieldImgUrlPlaceholder: "https://example.com/image.jpg",
+    fieldDescripcion: "Description",
+    fieldDescripcionPlaceholder: "Brief product description",
 
     // Producer create
     createRawMaterialTitle: "Create Raw Material Token",
@@ -316,6 +322,12 @@ const translations = {
     featuresJson: "Características (JSON)",
     invalidJsonFormat: "Formato JSON inválido",
     createTokenBtn: "Crear Token",
+    fieldUnidadMedida: "Unidad de Medida",
+    fieldUnidadMedidaPlaceholder: "ej. unidad, kg, litro",
+    fieldImgUrl: "URL de Imagen",
+    fieldImgUrlPlaceholder: "https://ejemplo.com/imagen.jpg",
+    fieldDescripcion: "Descripción",
+    fieldDescripcionPlaceholder: "Breve descripción del producto",
 
     // Producer create
     createRawMaterialTitle: "Crear Token de Materia Prima",

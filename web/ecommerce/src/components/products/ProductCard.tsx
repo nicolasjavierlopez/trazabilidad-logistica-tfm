@@ -2,7 +2,7 @@
 import { useState } from "react";
 import {
   Card, CardContent, CardMedia, CardActions, Box, Typography,
-  Button, Chip, Tooltip, IconButton,
+  Button, Chip, Tooltip, IconButton, Skeleton,
 } from "@mui/material";
 import ImageNotSupportedIcon from "@mui/icons-material/ImageNotSupported";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
@@ -25,6 +25,7 @@ export default function ProductCard({ product }: Props) {
   const { t } = useI18n();
   const [detailOpen, setDetailOpen] = useState(false);
   const [traceOpen, setTraceOpen] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
   const qty = getQty(product.tokenId);
 
   const extraAttrs = visibleAttrs(product.features);
@@ -34,12 +35,17 @@ export default function ProductCard({ product }: Props) {
       <Card elevation={2} sx={{ display: "flex", flexDirection: "column", height: "100%", "&:hover": { boxShadow: 6 }, transition: "box-shadow 0.2s" }}>
         {product.imgUrl ? (
           <Box sx={{ p: "20px", pb: 0 }} onClick={() => setDetailOpen(true)}>
+            {!imgLoaded && (
+              <Skeleton variant="rectangular" height={180} sx={{ borderRadius: 1 }} animation="wave" />
+            )}
             <CardMedia
               component="img"
               height="180"
               image={product.imgUrl}
               alt={product.name}
-              sx={{ objectFit: "cover", cursor: "pointer", borderRadius: 1 }}
+              onLoad={() => setImgLoaded(true)}
+              onError={() => setImgLoaded(true)}
+              sx={{ objectFit: "cover", cursor: "pointer", borderRadius: 1, display: imgLoaded ? "block" : "none" }}
             />
           </Box>
         ) : (

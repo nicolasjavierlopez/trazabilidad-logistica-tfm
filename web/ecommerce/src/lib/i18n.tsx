@@ -41,6 +41,8 @@ const translations = {
     attributes: "Attributes",
     characteristics: "Characteristics",
     close: "Close",
+    tableKey: "Key",
+    tableValue: "Value",
     attrTokenId: "Token ID",
     attrSupply: "Supply",
     attrSoldBy: "Sold by",
@@ -116,6 +118,9 @@ const translations = {
     faq6A: "This is a demo environment. In a production version, return policies would be handled off-chain by the retailer, while the token transfer would be reversed via a smart-contract call.",
     faq7Q: "What networks are supported?",
     faq7A: "The app can connect to a local Anvil development chain or to the Sepolia test network via Alchemy. Mainnet deployment is planned for future iterations.",
+    // Transaction
+    viewOnExplorer: "View transaction on Etherscan",
+    txHash: "Transaction hash",
     // Traceability
     viewTraceability: "View traceability",
     traceabilityTitle: "Product Traceability",
@@ -158,6 +163,8 @@ const translations = {
     attributes: "Atributos",
     characteristics: "Características",
     close: "Cerrar",
+    tableKey: "Atributo",
+    tableValue: "Detalle",
     attrTokenId: "ID Token",
     attrSupply: "Suministro",
     attrSoldBy: "Vendido por",
@@ -233,6 +240,9 @@ const translations = {
     faq6A: "Este es un entorno demo. En producción, las devoluciones serían gestionadas off-chain por el minorista, mientras que la transferencia del token se revertiría mediante un contrato inteligente.",
     faq7Q: "¿Qué redes están soportadas?",
     faq7A: "La app puede conectarse a una cadena de desarrollo Anvil local o a la red de prueba Sepolia via Alchemy. El despliegue en Mainnet está planificado para futuras iteraciones.",
+    // Transaction
+    viewOnExplorer: "Ver transacción en Etherscan",
+    txHash: "Hash de transacción",
     // Traceability
     viewTraceability: "Ver trazabilidad",
     traceabilityTitle: "Trazabilidad del Producto",

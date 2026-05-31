@@ -135,8 +135,8 @@ export default function ProductDetailDialog({ product, onClose }: Props) {
             <Table size="small">
               <TableHead>
                 <TableRow sx={{ "& th": { fontWeight: "bold", bgcolor: "grey.50" } }}>
-                  <TableCell>Key</TableCell>
-                  <TableCell>Value</TableCell>
+                  <TableCell>{t("tableKey")}</TableCell>
+                  <TableCell>{t("tableValue")}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

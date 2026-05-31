@@ -10,7 +10,7 @@ import ProductToolbar, { type ViewMode } from "@/components/products/ProductTool
 import { useProducts } from "@/hooks/useProducts";
 import { useI18n } from "@/lib/i18n";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 export default function HomePage() {
   const { products, isLoading } = useProducts();

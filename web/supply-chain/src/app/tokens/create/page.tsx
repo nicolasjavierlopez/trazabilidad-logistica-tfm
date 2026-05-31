@@ -165,6 +165,9 @@ function CreateTokenForm({ role }: { role: UserRole }) {
   // ── Single-token form state ──────────────────────────────────────────────
   const [name, setName] = useState("");
   const [supply, setSupply] = useState("");
+  const [unidadMedida, setUnidadMedida] = useState("");
+  const [imgUrl, setImgUrl] = useState("");
+  const [descripcion, setDescripcion] = useState("");
   const [features, setFeatures] = useState("");
   const [jsonError, setJsonError] = useState("");
   const [parentTokens, setParentTokens] = useState<(RawToken | null)[]>([null]);
@@ -212,24 +215,27 @@ function CreateTokenForm({ role }: { role: UserRole }) {
   const addParent = () => setParentTokens(prev => [...prev, null]);
   const removeParent = (i: number) => setParentTokens(prev => prev.filter((_, idx) => idx !== i));
 
+  const buildFeatures = (additionalIds: string[]): string | null => {
+    if (!validateJson(features)) return null;
+    const obj: Record<string, unknown> = features.trim() ? JSON.parse(features) : {};
+    if (unidadMedida.trim()) obj.unidadMedida = unidadMedida.trim();
+    if (descripcion.trim()) obj.descripcion = descripcion.trim();
+    if (imgUrl.trim()) obj.imgUrl = imgUrl.trim();
+    if (additionalIds.length > 0) obj._parentIds = additionalIds;
+    return Object.keys(obj).length > 0 ? JSON.stringify(obj) : "";
+  };
+
   const handleCreate = () => {
     if (!name.trim() || !supply) return;
     if (showParents && !parentTokens[0]) return;
-    if (!validateJson(features)) return;
 
     const primaryParentId = showParents ? (parentTokens[0]?.id ?? 0n) : 0n;
     const additionalIds = showParents
       ? parentTokens.slice(1).filter((t): t is RawToken => t !== null).map(t => t.id.toString())
       : [];
 
-    let finalFeatures = features.trim();
-    if (additionalIds.length > 0) {
-      try {
-        const obj = finalFeatures ? JSON.parse(finalFeatures) : {};
-        obj._parentIds = additionalIds;
-        finalFeatures = JSON.stringify(obj, null, 2);
-      } catch { return; }
-    }
+    const finalFeatures = buildFeatures(additionalIds);
+    if (finalFeatures === null) return;
 
     writeContract({
       address: RAW_MATERIAL_ADDRESS,
@@ -355,6 +361,27 @@ function CreateTokenForm({ role }: { role: UserRole }) {
           label={t("totalSupply")} placeholder={t("enterTotalSupply")}
           type="number" value={supply} onChange={e => setSupply(e.target.value)}
           fullWidth disabled={singleLoading || batchRunning} slotProps={{ htmlInput: { min: 1 } }}
+        />
+
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <TextField
+            label={t("fieldUnidadMedida")} placeholder={t("fieldUnidadMedidaPlaceholder")}
+            value={unidadMedida} onChange={e => setUnidadMedida(e.target.value)}
+            fullWidth disabled={singleLoading || batchRunning}
+            helperText={t("optional")}
+          />
+          <TextField
+            label={t("fieldImgUrl")} placeholder={t("fieldImgUrlPlaceholder")}
+            value={imgUrl} onChange={e => setImgUrl(e.target.value)}
+            fullWidth disabled={singleLoading || batchRunning}
+            helperText={t("optional")}
+          />
+        </Box>
+        <TextField
+          label={t("fieldDescripcion")} placeholder={t("fieldDescripcionPlaceholder")}
+          value={descripcion} onChange={e => setDescripcion(e.target.value)}
+          fullWidth multiline rows={2} disabled={singleLoading || batchRunning}
+          helperText={t("optional")}
         />
 
         {showParents && (

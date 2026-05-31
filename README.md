@@ -97,6 +97,8 @@ logistics-pfm/
 |
 +-- docs/
 |   +-- manual-usuario.md                 # Manual completo en espanol
+|   +-- diagramas.md                      # Diagramas Mermaid del proyecto
++-- screenshots/                          # Capturas de pantalla
 +-- batch-tokens-example.csv              # Plantilla CSV de ejemplo
 ```
 
@@ -152,7 +154,7 @@ ALCHEMY_API_KEY=tu_api_key_de_alchemy
 PRIVATE_KEY=0x_tu_clave_privada_de_testnet
 ```
 
-> IMPORTANTE: Nunca subas `sc/.env` al repositorio. El `.gitignore` ya lo excluye.
+> IMPORTANTE: No se encuentra el arhivo `sc/.env` en el repositorio por seguridad.
 
 ### Supply Chain (`web/supply-chain/.env.local`)
 

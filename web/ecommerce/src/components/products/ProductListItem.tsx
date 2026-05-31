@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Box, Typography, Paper, Chip, Tooltip, IconButton } from "@mui/material";
+import { Box, Typography, Paper, Chip, Tooltip, IconButton, Skeleton } from "@mui/material";
 import ImageNotSupportedIcon from "@mui/icons-material/ImageNotSupported";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import AddIcon from "@mui/icons-material/Add";
@@ -22,6 +22,7 @@ export default function ProductListItem({ product }: Props) {
   const { t } = useI18n();
   const [detailOpen, setDetailOpen] = useState(false);
   const [traceOpen, setTraceOpen] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
   const qty = getQty(product.tokenId);
   const extraAttrs = visibleAttrs(product.features).slice(0, 4);
 
@@ -46,12 +47,19 @@ export default function ProductListItem({ product }: Props) {
           }}
         >
           {product.imgUrl ? (
-            <Box
-              component="img"
-              src={product.imgUrl}
-              alt={product.name}
-              sx={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
+            <>
+              {!imgLoaded && (
+                <Skeleton variant="rectangular" width="100%" height="100%" animation="wave" />
+              )}
+              <Box
+                component="img"
+                src={product.imgUrl}
+                alt={product.name}
+                onLoad={() => setImgLoaded(true)}
+                onError={() => setImgLoaded(true)}
+                sx={{ width: "100%", height: "100%", objectFit: "cover", display: imgLoaded ? "block" : "none" }}
+              />
+            </>
           ) : (
             <ImageNotSupportedIcon sx={{ fontSize: 32, color: "grey.400" }} />
           )}
